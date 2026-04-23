@@ -1,0 +1,7 @@
+[
+  { "email": "admin@demo.dentalflow.test", "full_name": "Morgan Admin", "role": "admin" },
+  { "email": "frontdesk@demo.dentalflow.test", "full_name": "Riley Front", "role": "front_desk" },
+  { "email": "dentist@demo.dentalflow.test", "full_name": "Dana Dentist", "role": "dentist" },
+  { "email": "hygienist@demo.dentalflow.test", "full_name": "Hannah Hygiene", "role": "hygienist" },
+  { "email": "patient@demo.dentalflow.test", "full_name": "Pat Patient", "role": "patient" }
+]
