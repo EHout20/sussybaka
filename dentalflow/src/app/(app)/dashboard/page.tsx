@@ -33,6 +33,7 @@ export default async function DashboardPage() {
   if (pErr) logPostgrest("dashboard:patients_count", pErr);
   if (aErr) logPostgrest("dashboard:appointments_today", aErr);
   if (tErr) logPostgrest("dashboard:tasks_open", tErr);
+  const schemaNotReady = [pErr, aErr, tErr].some((e) => e?.code === "PGRST205");
   const overdue = (tasks ?? []).filter(
     (x) => x.due_date && isBefore(new Date(x.due_date), new Date())
   );
@@ -43,6 +44,15 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-sm text-slate-500">Welcome, {me?.full_name}. Today is {format(today0, "PPPP")}.</p>
       </div>
+      {schemaNotReady ? (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
+          Database tables are not initialized yet. Run the SQL files in
+          <span className="mx-1 rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs dark:bg-amber-900/50">
+            supabase/migrations
+          </span>
+          from the README, then refresh.
+        </div>
+      ) : null}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
           <div className="text-xs text-slate-500">Patients in system (demo)</div>

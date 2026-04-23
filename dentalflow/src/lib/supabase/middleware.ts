@@ -2,6 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 import { getSupabasePublishableKey, getSupabaseUrl } from "./env";
 
+const AUTH_BYPASS = process.env.AUTH_BYPASS === "true";
+
 const staffPrefixes = [
   "/dashboard",
   "/schedule",
@@ -15,6 +17,14 @@ function isStaffPath(path: string) {
 }
 
 export async function updateSession(request: NextRequest) {
+  if (AUTH_BYPASS) {
+    const path = request.nextUrl.pathname;
+    if (path === "/login") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
   const supabase = createServerClient(
     getSupabaseUrl(),

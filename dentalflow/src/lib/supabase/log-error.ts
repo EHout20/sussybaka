@@ -6,5 +6,11 @@ export function logPostgrest(context: string, err: PostgrestError | null | undef
   const parts = [err.code, err.message, err.details, err.hint].filter(
     (s): s is string => typeof s === "string" && s.length > 0
   );
-  console.error(`[${context}]`, parts.length ? parts.join(" | ") : JSON.stringify(err));
+  const msg = parts.length ? parts.join(" | ") : JSON.stringify(err);
+  // Missing-table schema cache errors are expected before migrations are applied.
+  if (err.code === "PGRST205") {
+    console.warn(`[${context}]`, msg);
+    return;
+  }
+  console.error(`[${context}]`, msg);
 }

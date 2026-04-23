@@ -9,7 +9,18 @@ export type SessionProfile = {
   patient_id: string | null;
 };
 
+// Temporary local-dev bypass: defaults OFF. Enable only with AUTH_BYPASS=true.
+const AUTH_BYPASS = process.env.AUTH_BYPASS === "true";
+const BYPASS_PROFILE: SessionProfile = {
+  id: "local-dev-admin",
+  email: "local-admin@dentalflow.dev",
+  full_name: "Local Admin",
+  role: "admin",
+  patient_id: null,
+};
+
 export async function getSessionUser() {
+  if (AUTH_BYPASS) return { id: BYPASS_PROFILE.id } as any;
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) return null;
@@ -17,6 +28,7 @@ export async function getSessionUser() {
 }
 
 export async function getSessionProfile(): Promise<SessionProfile | null> {
+  if (AUTH_BYPASS) return BYPASS_PROFILE;
   const supabase = await createClient();
   const {
     data: { user },
