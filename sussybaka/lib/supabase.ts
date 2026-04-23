@@ -36,7 +36,8 @@ export function getSupabaseClient() {
       storage,
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: false,
+      // Required for magic-link / OAuth callbacks in browser environments.
+      detectSessionInUrl: true,
     },
   });
 

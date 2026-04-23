@@ -10,6 +10,7 @@ export default function SignInScreen() {
   const supabase = getSupabaseClient();
   const [emailAddress, setEmailAddress] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [magicLoading, setMagicLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -17,9 +18,17 @@ export default function SignInScreen() {
     if (magicLoading || googleLoading) return;
     setMagicLoading(true);
     setErrorMessage(null);
+    setSuccessMessage(null);
+
+    const trimmedEmail = emailAddress.trim();
+    const emailRedirectTo =
+      typeof window !== 'undefined' ? `${window.location.origin}/(auth)/sign-in` : undefined;
 
     const { error } = await supabase.auth.signInWithOtp({
-      email: emailAddress.trim(),
+      email: trimmedEmail,
+      options: {
+        emailRedirectTo,
+      },
     });
     if (error) {
       setErrorMessage(error.message);
@@ -27,13 +36,14 @@ export default function SignInScreen() {
       return;
     }
     setMagicLoading(false);
-    router.replace('/(app)/dashboard');
+    setSuccessMessage(`Magic link sent to ${trimmedEmail}. Open it in the same browser.`);
   };
 
   const onGoogle = async () => {
     if (magicLoading || googleLoading) return;
     setGoogleLoading(true);
     setErrorMessage(null);
+    setSuccessMessage(null);
     const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
     if (error) {
       setErrorMessage(error.message);
@@ -83,6 +93,7 @@ export default function SignInScreen() {
         />
 
         {errorMessage ? <ThemedText style={styles.error}>{errorMessage}</ThemedText> : null}
+        {successMessage ? <ThemedText style={styles.success}>{successMessage}</ThemedText> : null}
 
         <Pressable
           style={({ pressed }) => [
@@ -195,5 +206,8 @@ const styles = StyleSheet.create({
   },
   error: {
     color: '#cc2b2b',
+  },
+  success: {
+    color: '#2f7d32',
   },
 });
